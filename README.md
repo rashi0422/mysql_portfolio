@@ -56,17 +56,21 @@ select distinct state from project.population where lower(State) like 'a%';
 select distinct state from project.population where lower(State) like 'a%' or lower(State) like 'b%';
 
 -- Joining both table --
+
 select project.population.State,project.population.Population , project.population.District, project.literacy.Sex_Ratio from project.population inner join project.literacy on project.population.District = project.population.District;
 
 -- Calulate males and females --
+
 select population.District ,population.State , population.Population/(literacy.Sex_Ratio +1 ) males, (population.Population*literacy.Sex_Ratio)/(literacy.Sex_Ratio+1) females from 
 (select population.District, population.State, literacy.Sex_Ratio/1000 sex_ratio, population.population from population inner join literacy on population.District = population.District) as sub ;
 
 -- total literacy rate --
+
 select population.State, literacy.District, literacy.Literacy_ratio*population.population literate_people , (1-literacy.literacy_ratio)* population.population illiterate_people from 
 (select population.District , population.State , literacy.Literacy/100 literacy_ratio, population.Population from project.population inner join project.literacy on population.District = literacy.District) as sub;
 
 -- Rank --
+
 select population.* from (select literacy.District , literacy.State, literacy.literacy , rank() over (partition by state order by literacy desc) rnk from project.population) population 
 where Population.rnk in(1,2,3) order by State ;
 
